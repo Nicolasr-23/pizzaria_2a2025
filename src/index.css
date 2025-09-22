@@ -28,7 +28,7 @@ body {
   place-items: start;
   min-width: 320px;
   min-height: 100vh;
-  background-color: aquamarine;
+  background-color: rgb(49, 51, 143);
   color: yellow;
 }
 
