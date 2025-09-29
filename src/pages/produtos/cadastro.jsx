@@ -1,55 +1,71 @@
+// Hooks do react - estado dos dados / renderização
 import { useState, useEffect } from "react";
+// Ferramenta de consumo de rotas ou endpoints
 import axios from "axios";
 
 // Formulário simples em JavaScript usando apenas <div>, <input>, useState/useEffect e axios
 const CadastroProduto = () => {
+  // Estado com dados do formulário
   const [form, setForm] = useState({
     nome: "",
-    descricao: "",
     tipo: "",
-    preco: "",
-    categoriaId: "",
+    precoVenda: "",
+    descricao: ""
   });
+  // Estado observa a execução do botão
   const [loading, setLoading] = useState(false);
+  // Estado armazena a mensagem de sucesso ou insucesso do cadastro
   const [msg, setMsg] = useState("");
 
+  // Controla a renderização da página, observando o formulário
+  // Troca vírgula do preço por ponto decimal
   useEffect(() => {
-    if (form.preco.includes(",")) {
-      setForm((f) => ({ ...f, preco: f.preco.replace(",", ".") }));
+    if (form.precoVenda.includes(",")) {
+      setForm((f) => ({ ...f, precoVenda: f.precoVenda.replace(",", ".") }));
     }
-  }, [form.preco]);
-
+  }, [form.precoVenda]);
+  // Método ou componente de definição de dados do formulário
+  // Captura dados do formulário e monta o JSON
   const onChange = (e) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
   };
-
+  // Método acionado após cadastro dos dados
   const submit = async () => {
     setMsg("");
     const payload = {
       nome: form.nome,
-      descricao: form.descricao,
       tipo: form.tipo,
-      preco: Number(form.preco),
-      categoriaId: parseInt(form.categoriaId, 10),
+      precoVenda: Number(form.precoVenda),
+      descricao: form.descricao     
     };
-
-    if (!payload.nome || !payload.descricao || !payload.tipo || !payload.preco || !payload.categoriaId) {
+    // Crítica ou verificação do formulário
+    if (!payload.nome || !payload.descricao || !payload.tipo || !payload.precoVenda) {
       setMsg("Preencha todos os campos corretamente.");
       return;
     }
-
+    // ativa carregamento da página
     setLoading(true);
     try {
-      axios.post("http://172.19.0.49/pizzariateste/api/v1/produto", payload)
+      // POST - INSERT - cadastra os dados no servidor (banco de dados)
+      axios.post("http://172.19.0.49/pizzariateste/api/v1/produto", 
+        payload,
+        {
+          mode: "no-cors",
+          headers: {
+            "Accept":"*",
+            "Content-Type": "application/json"
+          }
+        }
+      )
       .then(response => {
-        console.log(response.data);
+        console.log(response.data.status);
       })
       .catch(error => {
         console.log(error);
       });
       setMsg("Produto cadastrado com sucesso.");
-      setForm({ nome: "", descricao: "", tipo: "", preco: "", categoriaId: "" });
+      setForm({ nome: "", tipo: "", precoVenda: "", descricao: ""});
     } catch (err) {
       const texto = err?.response?.data?.message || err?.message || "Falha ao cadastrar.";
       setMsg(texto);
@@ -93,9 +109,9 @@ const CadastroProduto = () => {
 
       <div>
         <input
-          name="preco"
+          name="precoVenda"
           placeholder="Preço (ex.: 199.90)"
-          value={form.preco}
+          value={form.precoVenda}
           onChange={onChange}
         />
       </div>
